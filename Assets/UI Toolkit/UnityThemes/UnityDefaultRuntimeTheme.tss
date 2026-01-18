@@ -1,0 +1,15 @@
+@import url("unity-theme://default");
+
+.anh-theo-chieu-ngang {
+    /* Bắt buộc chiều ngang luôn chiếm hết 100% khung cha */
+    width: 100%;
+
+    /* Chiều cao để tự động (Auto) -> Unity sẽ tự tính dựa trên tỉ lệ ảnh */
+    height: auto;
+
+    /* Quan trọng: Giữ nguyên tỉ lệ ảnh, không kéo giãn méo mó */
+    -unity-background-scale-mode: scale-to-fit;
+    
+    /* Đảm bảo ảnh nền nằm giữa (nếu chiều cao khung cha lớn hơn ảnh) */
+    -unity-background-image-tint-color: white; 
+}

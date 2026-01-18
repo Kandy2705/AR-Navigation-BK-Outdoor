@@ -1,0 +1,66 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.XR.ARFoundation;
+using UnityEngine.XR.ARSubsystems;
+using UnityEngine;
+
+public class NavigationTarget : MonoBehaviour
+{
+    [SerializeField] private GPSMarker gpsMarker;  // Tham chiếu script marker
+    [SerializeField] private Transform mapPlane;   // cùng mapPlane với marker
+    [SerializeField] private ARAnchorManager arAnchorManager; // AR Foundation Anchor Manager
+
+    [Header("Target GPS")]
+    public double targetLat;
+    public double targetLon;
+    public double targetAlt = 0.0;
+    private ARAnchor geoAnchor;
+
+    void CreateGeoAnchor()
+    {
+        if (geoAnchor != null)
+            return;
+
+        // AR Foundation 5.x+ hỗ trợ ARGeospatialAnchor
+        // ARGeospatialAnchor geospatialAnchor = arAnchorManager.AddAnchor(
+        //     new Pose(Vector3.zero, Quaternion.identity),
+        //     latitude: targetLat,
+        //     longitude: targetLon,
+        //     altitude: targetAlt
+        // );
+
+        // if (geospatialAnchor != null)
+        // {
+        //     geoAnchor = geospatialAnchor;
+        //     transform.SetParent(geoAnchor.transform);
+        //     transform.localPosition = Vector3.zero;
+        //     Debug.Log($"Geo Anchor tạo thành công tại lat:{targetLat}, lon:{targetLon}");
+        // }
+        // else
+        // {
+        //     Debug.LogWarning("Tạo Geo Anchor thất bại. Kiểm tra GPS / AR session");
+        // }
+    }
+
+    void Update()
+    {
+        if (gpsMarker == null || mapPlane == null) return;
+
+        // Lấy refECEF và refLat/Lon từ marker
+        var refECEF = gpsMarker.GetRefECEF();
+        var refLat = gpsMarker.refLat;
+        var refLon = gpsMarker.refLon;
+
+        // Tính ECEF của target
+        var targetECEF = gpsMarker.LatLonAltToECEF(targetLat, targetLon, targetAlt);
+
+        // Chuyển sang ENU
+        var enu = gpsMarker.ECEFToENU(targetECEF, refECEF, refLat, refLon);
+
+        // Chuyển sang Unity local position
+        Vector3 localPos = new Vector3((float)enu.e, (float)enu.u, (float)enu.n);
+        Vector3 worldPos = mapPlane.TransformPoint(localPos);
+
+        transform.position = worldPos;
+    }
+}
