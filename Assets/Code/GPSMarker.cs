@@ -6,6 +6,7 @@ using UnityEngine;
 public class GPSMarker : MonoBehaviour
 {
     public GameObject xrOrigin;
+    public Camera mainCamera;
     public GameObject marker;              // object tượng trưng vị trí người dùng
     public Transform mapPlane;
     public TextMeshProUGUI gpsText;
@@ -23,6 +24,31 @@ public class GPSMarker : MonoBehaviour
     private Vector3 originENU;             // để map ENU về Unity space
     private ECEF refECEF;
 
+    public double lat = 10.7741875;
+    public double lon = 106.6606904;
+    public double alt = 0.0;
+
+
+    public bool aligned = false;
+
+    private Vector3 lastUserENU;
+    public float alignThreshold = 2.0f;
+    public float alignStrength = 2.0f;
+
+    [Header("Mock Movement")]
+    public bool useMockMovement = false;
+    public float mockSpeed = 1.5f;
+
+    [Header("Heading Align")]
+    public bool rotationAligned = false;
+    public float headingAlignThreshold = 1.0f;
+
+    [Header("Mock Compass (Editor Test)")]
+    public bool useMockCompass = true;
+    [Range(0f, 360f)]
+    public float mockCompassHeading = 0f;
+
+
     void Start()
     {
         StartCoroutine(StartLocationService());
@@ -31,6 +57,7 @@ public class GPSMarker : MonoBehaviour
 
         refECEF = LatLonAltToECEF(refLat, refLon, refAlt);
         originENU = Vector3.zero;
+        marker.transform.localPosition = Vector3.zero;
     }
 
     IEnumerator StartLocationService()
@@ -63,17 +90,82 @@ public class GPSMarker : MonoBehaviour
         Debug.Log($"GPS Manual changed");
     }
 
+    float GetCurrentHeading()
+    {
+        if (useMockCompass)
+            return mockCompassHeading;
+
+        if (Input.compass.enabled)
+            return Input.compass.trueHeading;
+
+        return 0f;
+    }
+
+
+    void AlignMapRotationWithXR(float compassHeading)
+    {
+        float xrYaw = xrOrigin.transform.rotation.eulerAngles.y;
+
+        float mapYaw = xrYaw - compassHeading;
+
+        mapPlane.rotation = Quaternion.Euler(0f, mapYaw, 0f);
+
+        rotationAligned = true;
+
+        Debug.Log($"[ALIGN ROTATION] XR: {xrYaw:F1} | Compass: {compassHeading:F1} | MapYaw: {mapYaw:F1}");
+    }
+
+
+    Vector3 GetMockUserENU()
+    {
+        float e = 0f;
+        float n = 0f;
+
+        if (Input.GetKey(KeyCode.W)) n += 1f;
+        if (Input.GetKey(KeyCode.S)) n -= 1f;
+        if (Input.GetKey(KeyCode.D)) e += 1f;
+        if (Input.GetKey(KeyCode.A)) e -= 1f;
+
+        Vector3 dir = new Vector3(e, 0f, n);
+
+        if (dir.sqrMagnitude > 1f)
+            dir.Normalize();
+
+        return transform.localPosition + dir * mockSpeed * Time.deltaTime;
+    }
+
+
+    //void AlignEnvironmentToXR()
+    //{
+    //    Vector3 offset = mainCamera.transform.position - transform.position;
+
+    //    offset.y = 0f;
+
+    //    mapPlane.position += offset * alignStrength;
+    //}
+
+    void AlignEnvironmentToXR() { 
+        Vector3 offset = mainCamera.transform.position - transform.position; 
+        offset.y = 0f; 
+        mapPlane.position += offset * alignStrength; 
+    }
+
     void Update()
     {
-
-        double lat = 10.7741875;
-        double lon = 106.6606904;
-        double alt = 0.0;
 
         if (manual)
         {
             Debug.Log($"GPS Manual Mode: {manual}");
+            lat = Input.location.lastData.latitude;
+            lon = Input.location.lastData.longitude;
+
             if (Input.location.status == LocationServiceStatus.Running)
+            {
+                lat = Input.location.lastData.latitude;
+                lon = Input.location.lastData.longitude;
+            }
+
+            if (lat != Input.location.lastData.latitude || lon != Input.location.lastData.longitude)
             {
                 lat = Input.location.lastData.latitude;
                 lon = Input.location.lastData.longitude;
@@ -82,33 +174,83 @@ public class GPSMarker : MonoBehaviour
             ECEF pointECEF = LatLonAltToECEF(lat, lon, alt);
             ENU enu = ECEFToENU(pointECEF, refECEF, refLat, refLon);
 
-            Vector3 localPos = new Vector3((float)enu.e, (float)enu.u, (float)enu.n);
-            Vector3 worldPos = mapPlane.TransformPoint(localPos);
+            Vector3 userENU;
 
-            transform.position = worldPos;
-            if (marker != null)
+            Debug.Log($"useMock{useMockMovement}");
+            if (useMockMovement)
             {
-                marker.transform.position = worldPos;
+                userENU = GetMockUserENU();
             }
- 
+            else
+            {
+                userENU = new Vector3((float)enu.e, 0f, (float)enu.n);
+            }
+
+            transform.localPosition = userENU;
+
+            // nay cap nhat tren dien thoai
+            if (!rotationAligned && Input.compass.enabled)
+            {
+                float heading = Input.compass.trueHeading;
+
+                if (!rotationAligned && heading > headingAlignThreshold)
+                {
+                    AlignMapRotationWithXR(heading);
+                    AlignEnvironmentToXR();
+                    rotationAligned = true;
+                }
+
+            }
+
+            // nay cap nhat tren laptop
+            //if (!rotationAligned)
+            //{
+            //    float heading = GetCurrentHeading();
+
+            //    if (Mathf.Abs(heading) > headingAlignThreshold)
+            //    {
+            //        AlignMapRotationWithXR(heading);
+            //    }
+            //}
+
+            if (aligned)
+            {
+                Debug.Log("userENU: " + userENU);
+                Debug.Log("lastuserENU: " + lastUserENU);
+                Vector3 deltaENU = userENU - lastUserENU;
+
+                // chỉ align khi GPS thực sự thay đổi đáng kể
+                if (deltaENU.magnitude > alignThreshold)
+                {
+                    AlignEnvironmentToXR();
+                }
+            }
+            else
+            {
+                aligned = true;
+            }
+            lastUserENU = userENU;
+
+
         }
 
         if (gpsText != null)
         {
-            float xrOriginHeading = xrOrigin.transform.rotation.eulerAngles.y;
+            float mapPlantHeading = mapPlane.transform.rotation.eulerAngles.y;
             Transform markerTransform = transform;
             gpsText.text =
-                $"X: {markerTransform.localPosition.x}" +
-                $" Z: {markerTransform.localPosition.z} \n" +
-                $"X target: {targetObject.transform.localPosition.x}" +
-                $" Z target: {targetObject.transform.localPosition.z}\n" +
-                // $"Lat: {lat:F7}" +
-                // $" Lon: {lon:F7}\n" +
+                $"X: {markerTransform.position.x}" +
+                $" Z: {markerTransform.position.z} \n" +
+                $"X camera: {mainCamera.transform.position.x}" +
+                $" Z camera: {mainCamera.transform.position.z}\n" +
+                $"Lat: {lat:F7}" +
+                $" Lon: {lon:F7}\n" +
+                $"rotationAligned: {rotationAligned}" +
+                $" Input.compass.enabled: {Input.compass.enabled}\n" +
                 // $"E: {enu.e:F2} m" +
                 // $" N: {enu.n:F2} m" +
                 // $" U: {enu.u:F2} m\n" +
-                $"Heading: {Input.compass.trueHeading:F1}°" +
-                $"Huong xoay XR: {xrOriginHeading:F1}°";
+                $"Huong xoay mapPlant: {mapPlantHeading:F1}°";
         }
     }
 
@@ -161,9 +303,7 @@ public class GPSMarker : MonoBehaviour
         enu.n = -System.Math.Sin(refLat) * System.Math.Cos(refLon) * dx
               - System.Math.Sin(refLat) * System.Math.Sin(refLon) * dy
               + System.Math.Cos(refLat) * dz;
-        enu.u = System.Math.Cos(refLat) * System.Math.Cos(refLon) * dx
-              + System.Math.Cos(refLat) * System.Math.Sin(refLon) * dy
-              + System.Math.Sin(refLat) * dz;
+        enu.u = 0;
 
         return enu;
     }

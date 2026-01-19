@@ -64,6 +64,12 @@ MonoBehaviour:
   refLat: 10.7736444
   refLon: 106.6593743
   refAlt: 0
+  lat: 10.7741875
+  lon: 106.6606904
+  alt: 0
+  aligned: 0
+  alignThreshold: 0.5
+  alignStrength: 1
 --- !u!23 &8109478436142405310
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -702,6 +708,12 @@ MonoBehaviour:
   refLat: 10.7736444
   refLon: 106.6593743
   refAlt: 0
+  lat: 10.7741875
+  lon: 106.6606904
+  alt: 0
+  aligned: 0
+  alignThreshold: 0.5
+  alignStrength: 1
 --- !u!23 &549894900643720396
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1109,11 +1121,11 @@ Transform:
   m_GameObject: {fileID: 4636783942840539179}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 169.8, y: -0, z: 78.4}
-  m_LocalScale: {x: 13.55729, y: 0.0000000019557005, z: -18.85236}
+  m_LocalPosition: {x: 169.80002, y: 0, z: 78.40001}
+  m_LocalScale: {x: 13.557291, y: 0, z: -18.852362}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2366256767189349732}
+  m_Father: {fileID: 1446232476740872710}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2677775590144419256
 MeshFilter:
@@ -1192,7 +1204,7 @@ MonoBehaviour:
   m_OverrideTileSize: 0
   m_TileSize: 256
   m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.033333335
+  m_VoxelSize: 0.1
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: fbb577d2ffc4f1849805be5ebb32dd47, type: 2}
   m_BuildHeightMesh: 0
@@ -1562,6 +1574,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 8138651192716296972}
   - {fileID: 3734708820107071556}
   - {fileID: 4221989569434153692}
   - {fileID: 5404916319701904177}
@@ -1716,7 +1729,6 @@ Transform:
   m_LocalScale: {x: 2.2445, y: 2.2445, z: 2.2445}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8138651192716296972}
   - {fileID: 1446232476740872710}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
