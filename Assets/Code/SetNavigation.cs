@@ -27,7 +27,6 @@ public class SetNavigation : MonoBehaviour
 
     void Start()
     {
-        
         path = new NavMeshPath();
 
         meshFilter = GetComponent<MeshFilter>();
@@ -48,21 +47,36 @@ public class SetNavigation : MonoBehaviour
         if (!GlobalProperties.Instance.IsShowNavigation)
         {
             mesh.Clear();
+            meshRenderer.enabled = false;
             return;
         }
 
+        meshRenderer.enabled = true;
+
         if (navTargetObject == null || markerObject == null)
+        {
+            mesh.Clear();
             return;
+        }
 
-        // Tính toán đường đi NavMesh
-        NavMesh.CalculatePath(
-            markerObject.transform.position,
-            navTargetObject.transform.position,
-            NavMesh.AllAreas,
-            path
-        );
+        // Ensure both start and end are on the NavMesh by sampling nearby points
+        const float sampleDistance = 2.0f;
+        NavMeshHit startHit, endHit;
+        bool haveStart = NavMesh.SamplePosition(markerObject.transform.position, out startHit, sampleDistance, NavMesh.AllAreas);
+        bool haveEnd = NavMesh.SamplePosition(navTargetObject.transform.position, out endHit, sampleDistance, NavMesh.AllAreas);
 
-        if (path.corners.Length < 2)
+        if (!haveStart || !haveEnd)
+        {
+            // one or both points are off the NavMesh -> no path
+            mesh.Clear();
+            return;
+        }
+
+        // Calculate path using sampled positions on the NavMesh
+        NavMesh.CalculatePath(startHit.position, endHit.position, NavMesh.AllAreas, path);
+
+        // If path isn't complete or has too few corners, clear and return
+        if (path.status != NavMeshPathStatus.PathComplete || path.corners == null || path.corners.Length < 2)
         {
             mesh.Clear();
             return;

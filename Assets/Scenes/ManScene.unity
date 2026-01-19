@@ -598,7 +598,7 @@ Transform:
   m_GameObject: {fileID: 108915356}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 198.5905, y: 0, z: 28.86068}
+  m_LocalPosition: {x: 198.5905, y: 0.109, z: 28.86068}
   m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -682,10 +682,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xrOrigin: {fileID: 132730613}
   mainCamera: {fileID: 2012369697}
-  marker: {fileID: 974979347}
   mapPlane: {fileID: 1188183542}
   gpsText: {fileID: 473065743}
   targetObject: {fileID: 974979345}
+  alignXROriginToUser: {fileID: 1329301475}
   refLat: 10.7736444
   refLon: 106.6593743
   refAlt: 0
@@ -4226,7 +4226,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4221989569434153692, guid: af72142906128ae4b9549535e658aca9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.1001213
+      value: 0.1124
       objectReference: {fileID: 0}
     - target: {fileID: 4221989569434153692, guid: af72142906128ae4b9549535e658aca9, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4250,7 +4250,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8138651192716296972, guid: af72142906128ae4b9549535e658aca9, type: 3}
       propertyPath: m_LocalScale.z
-      value: -20.0476
+      value: -33.31338
       objectReference: {fileID: 0}
     - target: {fileID: 8138651192716296972, guid: af72142906128ae4b9549535e658aca9, type: 3}
       propertyPath: m_LocalPosition.x
@@ -4262,7 +4262,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8138651192716296972, guid: af72142906128ae4b9549535e658aca9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 72.4223
+      value: 6.0949
       objectReference: {fileID: 0}
     - target: {fileID: 8783774819965895137, guid: af72142906128ae4b9549535e658aca9, type: 3}
       propertyPath: refLat
@@ -4347,11 +4347,6 @@ GameObject:
 --- !u!4 &974979346 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3734708820107071556, guid: af72142906128ae4b9549535e658aca9, type: 3}
-  m_PrefabInstance: {fileID: 974979344}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &974979347 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 122032183004366844, guid: af72142906128ae4b9549535e658aca9, type: 3}
   m_PrefabInstance: {fileID: 974979344}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &974979349
@@ -5735,6 +5730,7 @@ MonoBehaviour:
   xrOrigin: {fileID: 132730615}
   userIcon: {fileID: 108915357}
   gpsMarker: {fileID: 108915360}
+  aligned: 0
 --- !u!1 &1380005367
 GameObject:
   m_ObjectHideFlags: 0

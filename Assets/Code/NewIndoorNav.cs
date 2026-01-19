@@ -23,6 +23,18 @@ public class NewIndoorNav : MonoBehaviour {
         navMeshPath = new NavMeshPath();
         Debug.Log("when play, activated");
 
+        // ensure LineRenderer is configured for world-space rendering and visible
+        if (line != null) {
+            line.useWorldSpace = true;
+            line.loop = false;
+            line.widthMultiplier = 0.05f;
+            if (line.material == null) {
+                line.material = new Material(Shader.Find("Unlit/Color")) { color = Color.green };
+            }
+            line.positionCount = 0;
+            line.enabled = true;
+        }
+
 #if UNITY_EDITOR
         // Giả lập ARTrackedImage được "phát hiện"
         SimulateImageDetected();
@@ -32,12 +44,24 @@ public class NewIndoorNav : MonoBehaviour {
     }
 
   private void Update() {
-    if (navigationBase != null && navigationTargets.Count > 0 && navMeshSurface != null)
+    if (navigationBase != null && navigationTargets.Count > 0 && navMeshSurface != null && line != null)
     {
-        // Luôn snap lại player và target mỗi frame
-        Vector3 playerPos = GetNavMeshPosition(player.position);
-        Vector3 targetPos = GetNavMeshPosition(navigationTargets[0].transform.position);
-        player.position = GetNavMeshPosition(player.position);
+        // Sample both player and target to nearest NavMesh positions (avoid moving the camera transform)
+        const float sampleDistance = 2.0f;
+        NavMeshHit startHit, endHit;
+        bool haveStart = NavMesh.SamplePosition(player.position, out startHit, sampleDistance, NavMesh.AllAreas);
+        bool haveEnd = NavMesh.SamplePosition(navigationTargets[0].transform.position, out endHit, sampleDistance, NavMesh.AllAreas);
+
+        if (!haveStart || !haveEnd)
+        {
+            // can't find valid NavMesh positions — clear line and skip
+            line.positionCount = 0;
+            return;
+        }
+
+        // Use sampled positions for pathfinding (do NOT overwrite player.position if it is the XR camera)
+        Vector3 playerPos = startHit.position;
+        Vector3 targetPos = endHit.position;
 
         // Tính path
         NavMesh.CalculatePath(playerPos, targetPos, NavMesh.AllAreas, navMeshPath);
