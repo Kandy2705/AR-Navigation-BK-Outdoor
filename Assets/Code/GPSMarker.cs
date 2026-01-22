@@ -7,12 +7,13 @@ public class GPSMarker : MonoBehaviour
 {
     public GameObject xrOrigin;
     public Camera mainCamera;
-    public GameObject marker;              // object tượng trưng vị trí người dùng
     public Transform mapPlane;
     public TextMeshProUGUI gpsText;
     public GameObject targetObject;
+    public AlignXROriginToUser alignXROriginToUser;
 
     private bool manual = true;
+    private bool gpsAvailable = false;
 
     const double a = 6378137.0;
     const double e2 = 6.694380004e-3;
@@ -21,7 +22,6 @@ public class GPSMarker : MonoBehaviour
     public double refLon = 106.6593743;
     public double refAlt = 0.0;
 
-    private Vector3 originENU;             // để map ENU về Unity space
     private ECEF refECEF;
 
     public double lat = 10.7741875;
@@ -56,15 +56,15 @@ public class GPSMarker : MonoBehaviour
         Input.compass.enabled = true;
 
         refECEF = LatLonAltToECEF(refLat, refLon, refAlt);
-        originENU = Vector3.zero;
-        marker.transform.localPosition = Vector3.zero;
+        //marker.transform.localPosition = Vector3.zero;
     }
 
     IEnumerator StartLocationService()
     {
         if (!Input.location.isEnabledByUser)
         {
-            Debug.Log("GPS không cho phép");
+            Debug.Log("GPS không cho phép — sử dụng tọa độ mặc định");
+            gpsAvailable = false;
             yield break;
         }
 
@@ -79,9 +79,14 @@ public class GPSMarker : MonoBehaviour
 
         if (maxWait <= 0 || Input.location.status == LocationServiceStatus.Failed)
         {
-            Debug.Log("Không thể xác nhận vị trí");
+            Debug.Log("Không thể xác nhận vị trí — sử dụng tọa độ mặc định");
+            gpsAvailable = false;
             yield break;
         }
+
+        // location service is running
+        gpsAvailable = true;
+        Debug.Log("GPS available");
     }
 
     public void updateGPS()
@@ -138,16 +143,17 @@ public class GPSMarker : MonoBehaviour
     //void AlignEnvironmentToXR()
     //{
     //    Vector3 offset = mainCamera.transform.position - transform.position;
-
+    //
     //    offset.y = 0f;
-
+    //
     //    mapPlane.position += offset * alignStrength;
     //}
 
-    void AlignEnvironmentToXR() { 
-        Vector3 offset = mainCamera.transform.position - transform.position; 
-        offset.y = 0f; 
-        mapPlane.position += offset * alignStrength; 
+    void AlignEnvironmentToXR()
+    {
+        Vector3 offset = mainCamera.transform.position - transform.position;
+        offset.y = 0f;
+        mapPlane.position += offset * alignStrength;
     }
 
     void Update()
@@ -156,37 +162,47 @@ public class GPSMarker : MonoBehaviour
         if (manual)
         {
             Debug.Log($"GPS Manual Mode: {manual}");
-            lat = Input.location.lastData.latitude;
-            lon = Input.location.lastData.longitude;
 
-            if (Input.location.status == LocationServiceStatus.Running)
+            //if (Input.location.status == LocationServiceStatus.Running)
+            //{
+            //    lat = Input.location.lastData.latitude;
+            //    lon = Input.location.lastData.longitude;
+            //}
+
+            //if (lat != Input.location.lastData.latitude || lon != Input.location.lastData.longitude)
+            //{
+            Debug.Log($"Manual GPS Update: Lat {lat}, Lon {lon}");
+            if (Input.location.lastData.latitude != 0 && Input.location.lastData.longitude != 0)
             {
                 lat = Input.location.lastData.latitude;
                 lon = Input.location.lastData.longitude;
             }
-
-            if (lat != Input.location.lastData.latitude || lon != Input.location.lastData.longitude)
-            {
-                lat = Input.location.lastData.latitude;
-                lon = Input.location.lastData.longitude;
-            }
+            //}
 
             ECEF pointECEF = LatLonAltToECEF(lat, lon, alt);
             ENU enu = ECEFToENU(pointECEF, refECEF, refLat, refLon);
 
             Vector3 userENU;
+            Vector3 worldPos;
 
             Debug.Log($"useMock{useMockMovement}");
             if (useMockMovement)
             {
+                // Get mock local ENU position and apply it to the marker (marker is local to mapPlane)
                 userENU = GetMockUserENU();
+                transform.localPosition = userENU;
+
+                // Also shift the map so the user icon on the map lines up with the main camera
+                AlignEnvironmentToXR();
             }
             else
             {
                 userENU = new Vector3((float)enu.e, 0f, (float)enu.n);
-            }
+                worldPos = mapPlane.TransformPoint(userENU);
+                transform.position = worldPos;
 
-            transform.localPosition = userENU;
+                AlignEnvironmentToXR();
+            }
 
             // nay cap nhat tren dien thoai
             if (!rotationAligned && Input.compass.enabled)
@@ -196,7 +212,7 @@ public class GPSMarker : MonoBehaviour
                 if (!rotationAligned && heading > headingAlignThreshold)
                 {
                     AlignMapRotationWithXR(heading);
-                    AlignEnvironmentToXR();
+                    //if (alignXROriginToUser.aligned) AlignEnvironmentToXR();
                     rotationAligned = true;
                 }
 
@@ -222,7 +238,7 @@ public class GPSMarker : MonoBehaviour
                 // chỉ align khi GPS thực sự thay đổi đáng kể
                 if (deltaENU.magnitude > alignThreshold)
                 {
-                    AlignEnvironmentToXR();
+                    if (alignXROriginToUser.aligned) AlignEnvironmentToXR();
                 }
             }
             else

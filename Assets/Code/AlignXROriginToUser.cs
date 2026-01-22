@@ -7,7 +7,7 @@ public class AlignXROriginToUser : MonoBehaviour
     public Transform userIcon;
     public GPSMarker gpsMarker;
 
-    private bool aligned = false;
+    public bool aligned = false;
 
     void Update()
     {

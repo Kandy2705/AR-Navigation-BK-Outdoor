@@ -293,7 +293,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 10756, guid: 0000000000000000e000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -682,15 +682,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xrOrigin: {fileID: 132730613}
   mainCamera: {fileID: 2012369697}
-  marker: {fileID: 974979347}
   mapPlane: {fileID: 1188183542}
   gpsText: {fileID: 473065743}
   targetObject: {fileID: 974979345}
+  alignXROriginToUser: {fileID: 1329301475}
   refLat: 10.7736444
   refLon: 106.6593743
   refAlt: 0
-  lat: 10.7741875
-  lon: 106.6606904
+  lat: 10.7736597
+  lon: 106.6608658
   alt: 0
   aligned: 0
   alignThreshold: 0.5
@@ -735,7 +735,7 @@ Transform:
   m_GameObject: {fileID: 132730613}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 363.68994, y: 0.217, z: 272.61694}
+  m_LocalPosition: {x: 363.68994, y: 0, z: 272.61694}
   m_LocalScale: {x: 0.44889998, y: 0.44889998, z: 0.44889998}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -788,7 +788,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15e88b63eaeff3e438a055698d829664, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 974979346}
+  player: {fileID: 2012369691}
   m_TrackedImageManager: {fileID: 0}
   trackedImagePrefab: {fileID: 7223908177488744565, guid: af72142906128ae4b9549535e658aca9, type: 3}
   line: {fileID: 334681832}
@@ -1525,6 +1525,7 @@ GameObject:
   m_Component:
   - component: {fileID: 334681833}
   - component: {fileID: 334681832}
+  - component: {fileID: 334681834}
   m_Layer: 0
   m_Name: NavigationLine
   m_TagString: Untagged
@@ -1541,9 +1542,9 @@ LineRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 334681831}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
+  m_DynamicOccludee: 0
   m_StaticShadowCaster: 0
   m_MotionVectors: 0
   m_LightProbeUsage: 0
@@ -1582,8 +1583,8 @@ LineRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0
-        value: 1
+        time: 0.059066758
+        value: 0.15630734
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -1649,6 +1650,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &334681834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 334681831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fab22b39a2b723447be7e7caa539bae6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  height: 0.3
 --- !u!1 &364894711
 GameObject:
   m_ObjectHideFlags: 0
@@ -2819,7 +2833,7 @@ Transform:
   m_GameObject: {fileID: 624480255}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 321.6225, y: -2.8134606, z: 136.11769}
+  m_LocalPosition: {x: 321.6225, y: 0, z: 136.11769}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4222,15 +4236,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4221989569434153692, guid: af72142906128ae4b9549535e658aca9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 144
+      value: 165.96
       objectReference: {fileID: 0}
     - target: {fileID: 4221989569434153692, guid: af72142906128ae4b9549535e658aca9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.1001213
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4221989569434153692, guid: af72142906128ae4b9549535e658aca9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 61
+      value: 9.55
       objectReference: {fileID: 0}
     - target: {fileID: 5129853425901416340, guid: af72142906128ae4b9549535e658aca9, type: 3}
       propertyPath: m_LocalPosition.y
@@ -4347,11 +4361,6 @@ GameObject:
 --- !u!4 &974979346 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3734708820107071556, guid: af72142906128ae4b9549535e658aca9, type: 3}
-  m_PrefabInstance: {fileID: 974979344}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &974979347 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 122032183004366844, guid: af72142906128ae4b9549535e658aca9, type: 3}
   m_PrefabInstance: {fileID: 974979344}
   m_PrefabAsset: {fileID: 0}
 --- !u!114 &974979349
@@ -5735,6 +5744,7 @@ MonoBehaviour:
   xrOrigin: {fileID: 132730615}
   userIcon: {fileID: 108915357}
   gpsMarker: {fileID: 108915360}
+  aligned: 0
 --- !u!1 &1380005367
 GameObject:
   m_ObjectHideFlags: 0

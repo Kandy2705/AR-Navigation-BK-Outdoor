@@ -90,8 +90,8 @@ public class SetNavigation : MonoBehaviour
         {
             Vector3 worldPos = corners[i];
             // dính nhẹ lên mặt đất
-            worldPos.y += 0.05f;
-
+            worldPos.y -= 0.2f;
+        
             // hướng: nếu last corner, lấy hướng từ prev->cur; nếu first, từ cur->next; else trung bình
             Vector3 forward;
             if (i == 0) forward = (corners[1] - corners[0]).normalized;
@@ -113,7 +113,7 @@ public class SetNavigation : MonoBehaviour
             Vector3 leftWorld = worldPos - right * width;
             Vector3 rightWorld = worldPos + right * width;
 
-            // Convert to local space of this GameObject
+      
             verts[i * 2 + 0] = transform.InverseTransformPoint(leftWorld);
             verts[i * 2 + 1] = transform.InverseTransformPoint(rightWorld);
 
@@ -131,12 +131,12 @@ public class SetNavigation : MonoBehaviour
             int i2 = (i + 1) * 2;
             int i3 = i2 + 1;
 
-            // Triangle 1: i0, i2, i1
+          
             tris.Add(i0);
             tris.Add(i2);
             tris.Add(i1);
 
-            // Triangle 2: i2, i3, i1
+           
             tris.Add(i2);
             tris.Add(i3);
             tris.Add(i1);
