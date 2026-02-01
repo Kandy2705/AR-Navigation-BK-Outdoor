@@ -686,11 +686,11 @@ MonoBehaviour:
   gpsText: {fileID: 473065743}
   targetObject: {fileID: 974979345}
   alignXROriginToUser: {fileID: 1329301475}
-  refLat: 10.7736444
-  refLon: 106.6593743
+  refLat: 10.7727167
+  refLon: 106.66227
   refAlt: 0
-  lat: 10.7736597
-  lon: 106.6608658
+  lat: 10.7727167
+  lon: 106.66227
   alt: 0
   aligned: 0
   alignThreshold: 0.5
@@ -2772,8 +2772,12 @@ MonoBehaviour:
   topDownCamera: {fileID: 810313856}
   navTargetObject: {fileID: 974979345}
   markerObject: {fileID: 2012369690}
-  startWidth: 0.2
-  endWidth: 0.2
+  startWidth: 0.15
+  endWidth: 0.15
+  lineHeight: -0.24
+  pathMaterial: {fileID: 2100000, guid: 8a044bce2f1abb54aa94c709d735ba71, type: 2}
+  fallbackColor: {r: 0, g: 1, b: 0, a: 1}
+  metersPerTile: 2
 --- !u!23 &624480257
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -7342,13 +7346,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1747010388}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.027, y: 0.0182, z: -0.1228}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.15, y: 0.0182, z: 0.04}
   m_LocalScale: {x: 0.14977647, y: 1.036641, z: 0.75768626}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 108915357}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!65 &1747010390
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7967,7 +7971,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1987488515
 RectTransform:
   m_ObjectHideFlags: 0

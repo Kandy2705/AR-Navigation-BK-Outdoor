@@ -20,6 +20,20 @@ public class SetNavigation : MonoBehaviour
     [SerializeField]
     private float endWidth = 0.2f;
 
+    [SerializeField]
+    private float lineHeight = -0.2f;
+
+    [SerializeField] 
+    private Material pathMaterial;
+
+    [SerializeField] 
+    private Color fallbackColor = Color.green;
+
+    [SerializeField] 
+    private float metersPerTile = 2.0f;
+
+
+
     private NavMeshPath path;
     private Mesh mesh;
     private MeshFilter meshFilter;
@@ -37,10 +51,10 @@ public class SetNavigation : MonoBehaviour
         meshFilter.mesh = mesh;
 
         // dùng Unlit shader để không bị ảnh hưởng ánh sáng và không xoay
-        meshRenderer.material = new Material(Shader.Find("Unlit/Color"))
-        {
-            color = Color.green
-        };
+        if (pathMaterial != null)
+            meshRenderer.material = pathMaterial;
+        else
+            meshRenderer.material = new Material(Shader.Find("Unlit/Color")) { color = fallbackColor };
     }
 
     void Update()
@@ -84,13 +98,14 @@ public class SetNavigation : MonoBehaviour
         Vector3[] verts = new Vector3[n * 2];
         Vector2[] uvs = new Vector2[n * 2];
         List<int> tris = new List<int>((n - 1) * 6);
+        float dist = 0f;
 
         // Tạo các cặp left/right cho từng corner (world space)
         for (int i = 0; i < n; i++)
         {
             Vector3 worldPos = corners[i];
             // dính nhẹ lên mặt đất
-            worldPos.y -= 0.2f;
+            worldPos.y += lineHeight;
         
             // hướng: nếu last corner, lấy hướng từ prev->cur; nếu first, từ cur->next; else trung bình
             Vector3 forward;
@@ -117,10 +132,14 @@ public class SetNavigation : MonoBehaviour
             verts[i * 2 + 0] = transform.InverseTransformPoint(leftWorld);
             verts[i * 2 + 1] = transform.InverseTransformPoint(rightWorld);
 
+            if (i > 0) dist += Vector3.Distance(corners[i - 1], corners[i]);
+            float v = dist / metersPerTile;     // v > 1 => tự repeat
+            uvs[i * 2 + 0] = new Vector2(0, v);
+            uvs[i * 2 + 1] = new Vector2(1, v);
             // simple UVs along length
-            float uvx = t * 1.0f; // you can scale by path length if want
-            uvs[i * 2 + 0] = new Vector2(0, uvx);
-            uvs[i * 2 + 1] = new Vector2(1, uvx);
+            //float uvx = t * 1.0f;
+            //uvs[i * 2 + 0] = new Vector2(0, uvx);
+            //uvs[i * 2 + 1] = new Vector2(1, uvx);
         }
 
         // Build triangles between consecutive corner pairs
