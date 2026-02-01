@@ -686,11 +686,11 @@ MonoBehaviour:
   gpsText: {fileID: 473065743}
   targetObject: {fileID: 974979345}
   alignXROriginToUser: {fileID: 1329301475}
-  refLat: 10.7727167
-  refLon: 106.66227
+  refLat: 10.7736444
+  refLon: 106.6593743
   refAlt: 0
-  lat: 10.7727167
-  lon: 106.66227
+  lat: 10.7736597
+  lon: 106.6608658
   alt: 0
   aligned: 0
   alignThreshold: 0.5
