@@ -20,6 +20,27 @@ public class SetNavigation : MonoBehaviour
     [SerializeField]
     private float endWidth = 0.2f;
 
+    [SerializeField]
+    private float lineHeightOffset = -0.2f;
+
+    [SerializeField]
+    private bool showLineHeightSlider = true;
+
+    [SerializeField]
+    private float lineHeightMin = -0.5f;
+
+    [SerializeField]
+    private float lineHeightMax = 0.5f;
+
+    [SerializeField]
+    private float lineHeightSliderWidthPercent = 0.7f;
+
+    [SerializeField]
+    private float lineHeightSliderHeight = 24f;
+
+    [SerializeField]
+    private float lineHeightSliderYOffset = 120f;
+
     private NavMeshPath path;
     private Mesh mesh;
     private MeshFilter meshFilter;
@@ -72,6 +93,26 @@ public class SetNavigation : MonoBehaviour
         BuildPathMesh(path.corners);
     }
 
+    private void OnGUI()
+    {
+        if (!showLineHeightSlider)
+        {
+            return;
+        }
+
+        float clampedWidthPercent = Mathf.Clamp(lineHeightSliderWidthPercent, 0.1f, 1f);
+        float sliderWidth = Screen.width * clampedWidthPercent;
+        float sliderX = (Screen.width - sliderWidth) * 0.5f;
+        float sliderY = lineHeightSliderYOffset;
+        Rect labelRect = new Rect(sliderX - 10f, sliderY - 28f, sliderWidth + 20f, 24f);
+        GUI.Label(labelRect, $"Line Height: {lineHeightOffset:0.00}m");
+        lineHeightOffset = GUI.HorizontalSlider(
+            new Rect(sliderX, sliderY, sliderWidth, lineHeightSliderHeight),
+            lineHeightOffset,
+            lineHeightMin,
+            lineHeightMax);
+    }
+
 
     void BuildPathMesh(Vector3[] corners)
     {
@@ -90,8 +131,8 @@ public class SetNavigation : MonoBehaviour
         {
             Vector3 worldPos = corners[i];
             // dính nhẹ lên mặt đất
-            worldPos.y -= 0.2f;
-        
+            worldPos.y += lineHeightOffset;
+
             // hướng: nếu last corner, lấy hướng từ prev->cur; nếu first, từ cur->next; else trung bình
             Vector3 forward;
             if (i == 0) forward = (corners[1] - corners[0]).normalized;
